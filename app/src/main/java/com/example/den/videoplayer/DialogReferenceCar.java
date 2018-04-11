@@ -59,7 +59,7 @@ public class DialogReferenceCar extends DialogFragment {
                 .setView(view);//показываем созданный вид
 
         dialog = builder.create();
-        dialog.getWindow().setBackgroundDrawableResource(R.color.colorPrimary);
+        dialog.getWindow().setBackgroundDrawableResource(R.color.colorDialog);
 
         return dialog;
     } // onCreateDialog
