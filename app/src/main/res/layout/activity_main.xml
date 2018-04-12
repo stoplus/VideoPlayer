@@ -42,26 +42,38 @@
                 android:id="@+id/txt_title"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
                 android:layout_weight="1"
                 android:gravity="center|start"
                 android:paddingLeft="10dp"
                 android:text="@string/title"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textColor="#FFF"
-                android:textSize="18sp"
-               android:layout_gravity="center_vertical"/>
+                android:textSize="18sp" />
 
         </LinearLayout>
+
+        <RelativeLayout
+            android:id="@+id/idLayoutButtonPermiss"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:visibility="gone">
+
+            <Button
+                android:id="@+id/idButtonPermission"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Получить разрешения" />
+        </RelativeLayout>
 
         <LinearLayout
             android:id="@+id/middle"
             android:layout_width="fill_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:orientation="horizontal"
-            android:visibility="visible">
-
-        </LinearLayout>
+            android:orientation="vertical"
+            android:visibility="visible"></LinearLayout>
 
 
         <LinearLayout
@@ -76,22 +88,21 @@
                 android:id="@+id/txt_currentTime"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center"
                 android:paddingBottom="10dp"
                 android:paddingLeft="20dp"
                 android:paddingRight="10dp"
                 android:paddingTop="10dp"
                 android:text="@string/time"
                 android:textAppearance="?android:attr/textAppearanceSmall"
-                android:textColor="#FFF"
-                android:layout_gravity="center"/>
+                android:textColor="#FFF" />
 
             <SeekBar
                 android:id="@+id/seekbar"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:layout_gravity="center"
-                />
+                android:layout_weight="1" />
             <!--android:indeterminate="false"
             style="@android:style/Widget.DeviceDefault.Light.SeekBar"
             android:thumbTint="#ffffff"
@@ -107,14 +118,14 @@
                 android:id="@+id/txt_totalDuration"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center"
                 android:paddingBottom="10dp"
                 android:paddingLeft="10dp"
                 android:paddingRight="20dp"
                 android:paddingTop="10dp"
                 android:text="@string/time"
                 android:textAppearance="?android:attr/textAppearanceSmall"
-                android:textColor="#FFF"
-                android:layout_gravity="center"/>
+                android:textColor="#FFF" />
 
         </LinearLayout>
 
@@ -128,14 +139,14 @@
             android:visibility="gone">
 
             <!--<ImageButton-->
-                <!--android:id="@+id/btn_lock"-->
-                <!--android:layout_width="32dp"-->
-                <!--android:layout_height="32dp"-->
-                <!--android:layout_gravity="right"-->
-                <!--android:layout_marginLeft="20dp"-->
-                <!--android:layout_weight="0"-->
-                <!--android:background="@null"-->
-                <!--android:src="@drawable/hplib_ic_lock" />-->
+            <!--android:id="@+id/btn_lock"-->
+            <!--android:layout_width="32dp"-->
+            <!--android:layout_height="32dp"-->
+            <!--android:layout_gravity="right"-->
+            <!--android:layout_marginLeft="20dp"-->
+            <!--android:layout_weight="0"-->
+            <!--android:background="@null"-->
+            <!--android:src="@drawable/hplib_ic_lock" />-->
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -220,88 +231,88 @@
             </LinearLayout>
 
             <!--<LinearLayout-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:layout_gravity="center"-->
-                <!--android:layout_marginLeft="20dp"-->
-                <!--android:layout_marginRight="20dp"-->
-                <!--android:layout_weight="1"-->
-                <!--android:orientation="horizontal"-->
-                <!--android:visibility="gone">-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_gravity="center"-->
+            <!--android:layout_marginLeft="20dp"-->
+            <!--android:layout_marginRight="20dp"-->
+            <!--android:layout_weight="1"-->
+            <!--android:orientation="horizontal"-->
+            <!--android:visibility="gone">-->
 
-                <!--<ImageButton-->
-                    <!--android:id="@+id/btn_prev"-->
-                    <!--android:layout_width="32dp"-->
-                    <!--android:layout_height="32dp"-->
-                    <!--android:layout_gravity="center"-->
-                    <!--android:layout_marginRight="24dp"-->
-                    <!--android:layout_weight="1"-->
-                    <!--android:background="@null"-->
-                    <!--android:cropToPadding="false"-->
-                    <!--android:src="@drawable/hplib_ic_previous" />-->
+            <!--<ImageButton-->
+            <!--android:id="@+id/btn_prev"-->
+            <!--android:layout_width="32dp"-->
+            <!--android:layout_height="32dp"-->
+            <!--android:layout_gravity="center"-->
+            <!--android:layout_marginRight="24dp"-->
+            <!--android:layout_weight="1"-->
+            <!--android:background="@null"-->
+            <!--android:cropToPadding="false"-->
+            <!--android:src="@drawable/hplib_ic_previous" />-->
 
 
-                <!--<ImageButton-->
-                    <!--android:id="@+id/btn_rev"-->
-                    <!--android:layout_width="32dp"-->
-                    <!--android:layout_height="32dp"-->
-                    <!--android:layout_gravity="center"-->
-                    <!--android:layout_marginRight="24dp"-->
-                    <!--android:layout_weight="1"-->
-                    <!--android:background="@null"-->
-                    <!--android:src="@drawable/hplib_ic_rewind" />-->
+            <!--<ImageButton-->
+            <!--android:id="@+id/btn_rev"-->
+            <!--android:layout_width="32dp"-->
+            <!--android:layout_height="32dp"-->
+            <!--android:layout_gravity="center"-->
+            <!--android:layout_marginRight="24dp"-->
+            <!--android:layout_weight="1"-->
+            <!--android:background="@null"-->
+            <!--android:src="@drawable/hplib_ic_rewind" />-->
 
-                <!--<ImageButton-->
-                    <!--android:id="@+id/btn_pause"-->
-                    <!--android:layout_width="32dp"-->
-                    <!--android:layout_height="32dp"-->
-                    <!--android:layout_gravity="center"-->
-                    <!--android:layout_marginRight="24dp"-->
-                    <!--android:layout_weight="1"-->
-                    <!--android:background="@null"-->
-                    <!--android:src="@drawable/hplib_ic_pause" />-->
+            <!--<ImageButton-->
+            <!--android:id="@+id/btn_pause"-->
+            <!--android:layout_width="32dp"-->
+            <!--android:layout_height="32dp"-->
+            <!--android:layout_gravity="center"-->
+            <!--android:layout_marginRight="24dp"-->
+            <!--android:layout_weight="1"-->
+            <!--android:background="@null"-->
+            <!--android:src="@drawable/hplib_ic_pause" />-->
 
-                <!--<ImageButton-->
-                    <!--android:id="@+id/btn_play"-->
-                    <!--android:layout_width="32dp"-->
-                    <!--android:layout_height="32dp"-->
-                    <!--android:layout_gravity="center"-->
-                    <!--android:layout_marginRight="24dp"-->
-                    <!--android:layout_weight="1"-->
-                    <!--android:background="@null"-->
-                    <!--android:src="@drawable/hplib_ic_play_download"-->
-                    <!--android:visibility="gone" />-->
+            <!--<ImageButton-->
+            <!--android:id="@+id/btn_play"-->
+            <!--android:layout_width="32dp"-->
+            <!--android:layout_height="32dp"-->
+            <!--android:layout_gravity="center"-->
+            <!--android:layout_marginRight="24dp"-->
+            <!--android:layout_weight="1"-->
+            <!--android:background="@null"-->
+            <!--android:src="@drawable/hplib_ic_play_download"-->
+            <!--android:visibility="gone" />-->
 
-                <!--<ImageButton-->
-                    <!--android:id="@+id/btn_stop"-->
-                    <!--android:layout_width="32dp"-->
-                    <!--android:layout_height="25dp"-->
-                    <!--android:layout_gravity="center"-->
-                    <!--android:layout_marginRight="24dp"-->
-                    <!--android:layout_weight="1"-->
-                    <!--android:background="@null"-->
-                    <!--android:src="@drawable/btn_stop"-->
-                    <!--/>-->
+            <!--<ImageButton-->
+            <!--android:id="@+id/btn_stop"-->
+            <!--android:layout_width="32dp"-->
+            <!--android:layout_height="25dp"-->
+            <!--android:layout_gravity="center"-->
+            <!--android:layout_marginRight="24dp"-->
+            <!--android:layout_weight="1"-->
+            <!--android:background="@null"-->
+            <!--android:src="@drawable/btn_stop"-->
+            <!--/>-->
 
-                <!--<ImageButton-->
-                    <!--android:id="@+id/btn_fwd"-->
-                    <!--android:layout_width="32dp"-->
-                    <!--android:layout_height="32dp"-->
-                    <!--android:layout_gravity="center"-->
-                    <!--android:layout_marginRight="24dp"-->
-                    <!--android:layout_weight="1"-->
-                    <!--android:background="@null"-->
-                    <!--android:src="@drawable/hplib_ic_forward"-->
-                    <!--android:text="+30s" />-->
+            <!--<ImageButton-->
+            <!--android:id="@+id/btn_fwd"-->
+            <!--android:layout_width="32dp"-->
+            <!--android:layout_height="32dp"-->
+            <!--android:layout_gravity="center"-->
+            <!--android:layout_marginRight="24dp"-->
+            <!--android:layout_weight="1"-->
+            <!--android:background="@null"-->
+            <!--android:src="@drawable/hplib_ic_forward"-->
+            <!--android:text="+30s" />-->
 
-                <!--<ImageButton-->
-                    <!--android:id="@+id/btn_next"-->
-                    <!--android:layout_width="32dp"-->
-                    <!--android:layout_height="32dp"-->
-                    <!--android:layout_gravity="center"-->
-                    <!--android:layout_weight="1"-->
-                    <!--android:background="@null"-->
-                    <!--android:src="@drawable/hplib_ic_next" />-->
+            <!--<ImageButton-->
+            <!--android:id="@+id/btn_next"-->
+            <!--android:layout_width="32dp"-->
+            <!--android:layout_height="32dp"-->
+            <!--android:layout_gravity="center"-->
+            <!--android:layout_weight="1"-->
+            <!--android:background="@null"-->
+            <!--android:src="@drawable/hplib_ic_next" />-->
             <!--</LinearLayout>-->
 
 

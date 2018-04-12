@@ -10,14 +10,17 @@ import android.net.Uri;
 import android.os.Handler;
 import android.provider.MediaStore;
 import android.provider.Settings;
+import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -64,6 +67,7 @@ public class MainActivity extends AppCompatActivity implements SelectedVideoInte
     private LinearLayout top_controls;
     private LinearLayout middle_panel;
     private LinearLayout unlock_panel;
+    private RelativeLayout layoutButtonPermiss;
     private View decorView;
     private View view;
     private int immersiveOptions;
@@ -99,9 +103,6 @@ public class MainActivity extends AppCompatActivity implements SelectedVideoInte
         } else MainActivityPermissionsDispatcher.getListVodeoWithPermissionCheck(this);
         if (dialogPlayList != null && !dialogPlayList.isVisible()) {
             flagStartPlay = true;
-        }
-        if (list == null || list.size() == 0) {
-            Snackbar.make(view, "На устройстве отсутствует видео файлы", Snackbar.LENGTH_INDEFINITE).show();
         }
     }//onCreate
 
@@ -379,7 +380,9 @@ public class MainActivity extends AppCompatActivity implements SelectedVideoInte
     }
 
     @NeedsPermission({Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE})
-    public void getListVodeo() {
+     void getListVodeo() {
+        layoutButtonPermiss = findViewById(R.id.idLayoutButtonPermiss);
+        layoutButtonPermiss.setVisibility(View.GONE);
         list = new ArrayList<>();
         listName = new ArrayList<>();
         ContentResolver contentResolver = getContentResolver();
@@ -421,18 +424,23 @@ public class MainActivity extends AppCompatActivity implements SelectedVideoInte
     //===========================================================================
     @OnPermissionDenied({Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE})
     void permissionsDenied() {
-        Intent intent = new Intent();
-        intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-        Uri uri = Uri.fromParts("package", getPackageName(), null);
-        intent.setData(uri);
-        startActivityForResult(intent, REQUEST_PERMITIONS);
+        Snackbar.make(view, "Нельзя запустить плеер без разрешений!", Snackbar.LENGTH_LONG).show();
+        layoutButtonPermiss = findViewById(R.id.idLayoutButtonPermiss);
+        layoutButtonPermiss.setVisibility(View.VISIBLE);
+        Button button = findViewById(R.id.idButtonPermission);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                MainActivityPermissionsDispatcher.getListVodeoWithPermissionCheck(MainActivity.this);
+            }
+        });
     }//permissionsDenied
 
     @OnNeverAskAgain({Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE})
     void onNeverAskAgain() {
         new android.app.AlertDialog.Builder(this)
-                .setTitle("Получите разрешения!!!")
-                .setMessage("Необходимо получить разрешения!!!")
+                .setTitle("Получите разрешения!")
+                .setMessage("Нельзя запустить плеер без разрешений!")
                 .setPositiveButton("Хорошо", (dialog, which) -> {
                     Intent intent = new Intent();
                     intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
@@ -447,20 +455,19 @@ public class MainActivity extends AppCompatActivity implements SelectedVideoInte
     @OnShowRationale({Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE})
     void showRationale(final PermissionRequest request) {
         new AlertDialog.Builder(this)
-                .setTitle("Получите разрешения!!!")
-                .setMessage("Необходимо получить разрешения!!!")
+                .setTitle("Получите разрешения!")
+                .setMessage("Необходимо получить разрешения для доступа к списку видеофайлов")
                 .setPositiveButton("Хорошо", (dialog, button) -> request.proceed())
                 .setNegativeButton("Не хочу", (dialog, button) -> request.cancel())
                 .show();
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_PERMITIONS) {
-            MainActivityPermissionsDispatcher.getListVodeoWithPermissionCheck(this);
-        }
-    }//onActivityResult
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        // NOTE: delegate the permission handling to generated method
+        MainActivityPermissionsDispatcher.onRequestPermissionsResult(this, requestCode, grantResults);
+    }
 
     @Override
     public void onBackPressed() {
