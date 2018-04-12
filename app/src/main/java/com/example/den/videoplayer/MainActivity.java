@@ -1,12 +1,17 @@
 package com.example.den.videoplayer;
 
+import android.Manifest;
 import android.content.ContentResolver;
+import android.content.Intent;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Handler;
-import android.os.Parcelable;
 import android.provider.MediaStore;
+import android.provider.Settings;
+import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.MotionEvent;
@@ -22,7 +27,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-public class MainActivity extends AppCompatActivity implements DeleteUserInterface{
+import permissions.dispatcher.NeedsPermission;
+import permissions.dispatcher.OnNeverAskAgain;
+import permissions.dispatcher.OnPermissionDenied;
+import permissions.dispatcher.OnShowRationale;
+import permissions.dispatcher.PermissionRequest;
+import permissions.dispatcher.RuntimePermissions;
+
+@RuntimePermissions
+public class MainActivity extends AppCompatActivity implements SelectedVideoInterface {
     private List<String> list;
     private List<String> listName;
     private VideoView videoView;
@@ -31,6 +44,8 @@ public class MainActivity extends AppCompatActivity implements DeleteUserInterfa
     private Handler threadHandler = new Handler();
     private int timeDuration;
     private int curPosition;
+    //    private Resources  res = this.getResources();//доступ к ресерсам;
+    private static final int REQUEST_PERMITIONS = 1100;
     private ImageButton btn_play;
     private ImageButton btn_pause;
     private ImageButton btn_fwd;
@@ -40,13 +55,22 @@ public class MainActivity extends AppCompatActivity implements DeleteUserInterfa
     private ImageButton btn_stop;
     private ImageButton btn_settings;
     private ImageButton btn_back;
-    private int currentTrackIndex;
+    private int curTrackIndex;
+    private boolean flagStartPlay = true;
+    private boolean flagSavedInstanceState = false;
     private Runnable hideControls;
     private ControlsMode controlsState;
-    private LinearLayout root, top_controls, middle_panel, unlock_panel, bottom_controls;
+    private LinearLayout root;
+    private LinearLayout top_controls;
+    private LinearLayout middle_panel;
+    private LinearLayout unlock_panel;
+    private LinearLayout bottom_controls;
     private View decorView;
-    private int uiImmersiveOptions;
+    private View view;
+    private int immersiveOptions;
     private TextView txt_title;
+    private DialogPlayList dialogPlayList;
+
     public enum ControlsMode {
         LOCK, FULLCONTORLS
     }
@@ -54,23 +78,47 @@ public class MainActivity extends AppCompatActivity implements DeleteUserInterfa
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        view = getLayoutInflater().inflate(R.layout.activity_main, null);
+        setContentView(view);
 
-        txt_title = (TextView) findViewById(R.id.txt_title);
-        btn_back = (ImageButton) findViewById(R.id.btn_back);
-        btn_play = (ImageButton) findViewById(R.id.btn_play);
-        btn_pause = (ImageButton) findViewById(R.id.btn_pause);
-        btn_fwd = (ImageButton) findViewById(R.id.btn_fwd);
-        btn_rev = (ImageButton) findViewById(R.id.btn_rev);
-        btn_prev = (ImageButton) findViewById(R.id.btn_prev);
-        btn_next = (ImageButton) findViewById(R.id.btn_next);
-        btn_stop = (ImageButton) findViewById(R.id.btn_stop);
-        btn_settings = (ImageButton) findViewById(R.id.btn_settings);
+        MainActivityPermissionsDispatcher.getListVodeoWithPermissionCheck(this);
 
-        root = (LinearLayout) findViewById(R.id.root);
+        if (savedInstanceState != null) {
+            curTrackIndex = savedInstanceState.getInt("curTrackIndex");
+            list = savedInstanceState.getStringArrayList("list");
+            listName = savedInstanceState.getStringArrayList("listName");
+            curPosition = savedInstanceState.getInt("curPosition");
+            flagStartPlay = savedInstanceState.getBoolean("flagStartPlay");
+            flagSavedInstanceState = true;
+        }
+        if (dialogPlayList != null && !dialogPlayList.isVisible()) {
+            flagStartPlay = true;
+        }
+    }//onCreate
+
+    private void instalVidget() {
+        txt_title = findViewById(R.id.txt_title);
+        btn_back = findViewById(R.id.btn_back);
+        btn_play = findViewById(R.id.btn_play);
+        btn_pause = findViewById(R.id.btn_pause);
+        btn_fwd = findViewById(R.id.btn_fwd);
+        btn_rev = findViewById(R.id.btn_rev);
+        btn_prev = findViewById(R.id.btn_prev);
+        btn_next = findViewById(R.id.btn_next);
+        btn_stop = findViewById(R.id.btn_stop);
+        btn_settings = findViewById(R.id.btn_settings);
+        txt_ct = findViewById(R.id.txt_currentTime);
+        txt_td = findViewById(R.id.txt_totalDuration);
+        seekBar = findViewById(R.id.seekbar);
+
+        root = findViewById(R.id.root);
         root.setVisibility(View.VISIBLE);
+        LinearLayout seekbar_time = findViewById(R.id.seekbar_time);
+        seekbar_time.setVisibility(View.VISIBLE);
+        LinearLayout top = findViewById(R.id.top);
+        top.setVisibility(View.VISIBLE);
 
-        uiImmersiveOptions = (View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+        immersiveOptions = (View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
                 | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                 | View.SYSTEM_UI_FLAG_LOW_PROFILE
                 | View.SYSTEM_UI_FLAG_FULLSCREEN
@@ -79,23 +127,10 @@ public class MainActivity extends AppCompatActivity implements DeleteUserInterfa
                 | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
         );
         decorView = getWindow().getDecorView();
-        decorView.setSystemUiVisibility(uiImmersiveOptions);
+        decorView.setSystemUiVisibility(immersiveOptions);
+    }//instalVidget
 
-        if (savedInstanceState != null) {
-            currentTrackIndex = savedInstanceState.getInt("currentTrackIndex");
-            list = savedInstanceState.getStringArrayList("list");
-            listName = savedInstanceState.getStringArrayList("listName");
-            curPosition = savedInstanceState.getInt("curPosition");
-        }
-
-        if (list == null) getListVodeo();
-        installVideo();
-        if (savedInstanceState != null)videoView.seekTo(curPosition);
-        initializationButtons();
-
-        txt_ct = findViewById(R.id.txt_currentTime);
-        txt_td = findViewById(R.id.txt_totalDuration);
-        seekBar = findViewById(R.id.seekbar);
+    private void initializationButtons() {
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -103,7 +138,6 @@ public class MainActivity extends AppCompatActivity implements DeleteUserInterfa
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-
             }
 
             @Override
@@ -111,15 +145,13 @@ public class MainActivity extends AppCompatActivity implements DeleteUserInterfa
                 videoView.seekTo(seekBar.getProgress());
             }
         });
-    }
-
-    private void initializationButtons() {
-
         btn_back.setOnClickListener(
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        videoView.stopPlayback();//mMediaPlayer = null
+                        if (list != null) {
+                            videoView.stopPlayback();//mMediaPlayer = null
+                        }
                         finish();
                     }
                 });
@@ -128,9 +160,9 @@ public class MainActivity extends AppCompatActivity implements DeleteUserInterfa
                     @Override
                     public void onClick(View view) {
                         if (!videoView.isPlaying()) {
+                            flagStartPlay = true;
                             installVideo();
-                            btn_pause.setVisibility(View.VISIBLE);
-                            btn_play.setVisibility(View.GONE);
+                            changePausePlay();
                         }
                     }
                 });
@@ -164,8 +196,9 @@ public class MainActivity extends AppCompatActivity implements DeleteUserInterfa
                     @Override
                     public void onClick(View view) {
                         videoView.suspend();//MediaPlayer !=null
-                        if (currentTrackIndex != 0) {
-                            currentTrackIndex -=1;
+                        if (curTrackIndex != 0) {
+                            curTrackIndex -= 1;
+                            curPosition = 0;
                             installVideo();
                             changePausePlay();
                         } else installVideo();
@@ -176,8 +209,9 @@ public class MainActivity extends AppCompatActivity implements DeleteUserInterfa
                     @Override
                     public void onClick(View view) {
                         videoView.suspend();//MediaPlayer !=null
-                        if (currentTrackIndex != list.size() - 1) {
-                            currentTrackIndex +=1;
+                        if (curTrackIndex != list.size() - 1) {
+                            curTrackIndex += 1;
+                            curPosition = 0;
                             installVideo();
                             changePausePlay();
                         } else installVideo();
@@ -196,22 +230,28 @@ public class MainActivity extends AppCompatActivity implements DeleteUserInterfa
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        DialogReferenceCar dialogReferenceCar = new DialogReferenceCar();
-                        dialogReferenceCar.show(getSupportFragmentManager(), "dialogReferenceCar");// отображение диалогового окна в фрагменте
+                        dialogPlayList = new DialogPlayList();
+                        Bundle args = new Bundle();//создаем Bundle для передачи в диалог информации
+                        args.putStringArrayList("listName", (ArrayList<String>) listName);
+                        dialogPlayList.setArguments(args);//показать данные в диалоге
+                        dialogPlayList.show(getSupportFragmentManager(), "dialogPlayList");// отображение диалогового окна в фрагменте
                         if (videoView.isPlaying()) {
                             videoView.pause();
                             btn_pause.setVisibility(View.GONE);
                             btn_play.setVisibility(View.VISIBLE);
+                            flagStartPlay = false;
+                            curPosition = videoView.getCurrentPosition();
                         }
                     }
                 });
     }//initializationButtons
 
-    private void changePausePlay(){
-            btn_pause.setVisibility(View.VISIBLE);
-            btn_play.setVisibility(View.GONE);
-    }
-//========================================================================================
+    private void changePausePlay() {
+        btn_pause.setVisibility(View.VISIBLE);
+        btn_play.setVisibility(View.GONE);
+    }//changePausePlay
+
+    //========================================================================================
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         switch (event.getAction()) {
@@ -220,15 +260,6 @@ public class MainActivity extends AppCompatActivity implements DeleteUserInterfa
                 break;
         }
         return super.onTouchEvent(event);
-    }
-
-    {
-        hideControls = new Runnable() {
-            @Override
-            public void run() {
-                hideAllControls();
-            }
-        };
     }
 
     private void hideAllControls() {
@@ -241,7 +272,7 @@ public class MainActivity extends AppCompatActivity implements DeleteUserInterfa
                 unlock_panel.setVisibility(View.GONE);
             }
         }
-        decorView.setSystemUiVisibility(uiImmersiveOptions);
+        decorView.setSystemUiVisibility(immersiveOptions);
     }
 
     private void showControls() {
@@ -257,46 +288,66 @@ public class MainActivity extends AppCompatActivity implements DeleteUserInterfa
         threadHandler.removeCallbacks(hideControls);
         threadHandler.postDelayed(hideControls, 3000);
     }
-   // ==============================================================================================
+    // ==============================================================================================
 
     private void installVideo() {
-        String videoSource = list.get(currentTrackIndex);
-        videoView = findViewById(R.id.idVideoView);
-        videoView.setVideoPath(videoSource);
-        videoView.requestFocus(0);
-        videoView.start(); // начинаем воспроизведение автоматически
-        videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-            @Override
-            public void onPrepared(MediaPlayer mp) {
-                timeDuration = videoView.getDuration();
-                String time = millisecondsToString(timeDuration);
-                txt_td.setText(time);
-                seekBar.setMax(timeDuration);
-                txt_title.setText(listName.get(currentTrackIndex));
-            }
-        });
-        videoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-            @Override
-            public void onCompletion(MediaPlayer mp) {
-                videoView.stopPlayback();//mMediaPlayer = null
-                btn_pause.setVisibility(View.GONE);
-                btn_play.setVisibility(View.VISIBLE);
-            }
-        });
+        if (list != null) {
+            if (list.size() != 0) {
+                hideControls = new Runnable() {
+                    @Override
+                    public void run() {
+                        hideAllControls();
+                    }
+                };
+                String videoSource = list.get(curTrackIndex);
+                videoView = findViewById(R.id.idVideoView);
+                videoView.setVideoPath(videoSource);
+                videoView.requestFocus(0);
+                if (flagStartPlay) {
+                    videoView.seekTo(curPosition);
+                    videoView.start(); // начинаем воспроизведение автоматически
+                    flagStartPlay = true;
+                } else {
+                    videoView.pause();
+                    btn_pause.setVisibility(View.GONE);
+                    btn_play.setVisibility(View.VISIBLE);
+                }
 
-        UpdateSeekBarThread updateSeekBarThread = new UpdateSeekBarThread();
-        threadHandler.postDelayed(updateSeekBarThread, 50);
-        threadHandler.postDelayed(hideControls, 3000);
-        controlsState = ControlsMode.FULLCONTORLS;
+                videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                    @Override
+                    public void onPrepared(MediaPlayer mp) {
+                        timeDuration = videoView.getDuration();
+                        String time = millisecondsToString(timeDuration);
+                        txt_td.setText(time);
+                        seekBar.setMax(timeDuration);
+                        txt_title.setText(listName.get(curTrackIndex));
+                    }
+                });
+                videoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                    @Override
+                    public void onCompletion(MediaPlayer mp) {
+                        videoView.stopPlayback();//mMediaPlayer = null
+                        btn_pause.setVisibility(View.GONE);
+                        btn_play.setVisibility(View.VISIBLE);
+                    }
+                });
+                UpdateSeekBar updateSeekBar = new UpdateSeekBar();
+                threadHandler.postDelayed(updateSeekBar, 50);
+                threadHandler.postDelayed(hideControls, 3000);
+                controlsState = ControlsMode.FULLCONTORLS;
+            }
+        }
     }
 
     @Override
-    public void deleteUser(int position) {
-        currentTrackIndex = position;
+    public void selectVideo(int position) {
+        flagStartPlay = true;
+        curTrackIndex = position;
+        curPosition = 0;
         installVideo();
     }
 
-    class UpdateSeekBarThread implements Runnable {
+    class UpdateSeekBar implements Runnable {
         public void run() {
             curPosition = videoView.getCurrentPosition();
             txt_ct.setText(millisecondsToString(curPosition));
@@ -316,6 +367,7 @@ public class MainActivity extends AppCompatActivity implements DeleteUserInterfa
         } else return String.format("%02d:%02d:%02d", hours, minutes, seconds);
     }
 
+    @NeedsPermission({Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE})
     public void getListVodeo() {
         list = new ArrayList<>();
         listName = new ArrayList<>();
@@ -324,27 +376,83 @@ public class MainActivity extends AppCompatActivity implements DeleteUserInterfa
         Cursor cursor = contentResolver.query(uri, null, null, null, null);
         if (cursor == null) {
             Toast.makeText(this, "Ошибка", Toast.LENGTH_LONG).show();
+            return;
         } else if (!cursor.moveToFirst()) {
-            Toast.makeText(this, "На устройстве отсутствует видео файлы", Toast.LENGTH_LONG).show();
+            Snackbar.make(view, "На устройстве отсутствует видео файлы", Snackbar.LENGTH_INDEFINITE).show();
+            return;
         } else {
+            instalVidget();
             int dataColumn = cursor.getColumnIndex(MediaStore.Video.Media.DATA);
             int dataColumnName = cursor.getColumnIndex(MediaStore.Video.Media.DISPLAY_NAME);
             do {
+                String name = cursor.getString(dataColumnName);
+                if (name != null) listName.add(name);
                 list.add(cursor.getString(dataColumn));
-                listName.add(cursor.getString(dataColumnName));
             } while (cursor.moveToNext());
         }
         if (cursor != null) cursor.close();
-        currentTrackIndex = 0;
+        curTrackIndex = 0;
+        installVideo();
+        if (flagSavedInstanceState) videoView.seekTo(curPosition);
+        initializationButtons();
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putInt("currentTrackIndex", currentTrackIndex);
+        outState.putInt("curTrackIndex", curTrackIndex);
         outState.putStringArrayList("list", (ArrayList<String>) list);
         outState.putStringArrayList("listName", (ArrayList<String>) listName);
-        outState.putInt("curPosition",  curPosition);
-
+        outState.putInt("curPosition", curPosition);
+        outState.putBoolean("flagStartPlay", flagStartPlay);
     }
+
+    //===========================================================================
+    @OnPermissionDenied({Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE})
+    void permissionsDenied() {
+        Intent intent = new Intent();
+        intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+        Uri uri = Uri.fromParts("package", getPackageName(), null);
+        intent.setData(uri);
+        startActivityForResult(intent, REQUEST_PERMITIONS);
+    }//permissionsDenied
+
+    @OnNeverAskAgain({Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE})
+    void onNeverAskAgain() {
+        new android.app.AlertDialog.Builder(this)
+                .setTitle("Получите разрешения!!!")
+                .setMessage("Необходимо получить разрешения!!!")
+                .setPositiveButton("Хорошо", (dialog, which) -> {
+                    Intent intent = new Intent();
+                    intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                    Uri uri = Uri.fromParts("package", getPackageName(), null);
+                    intent.setData(uri);
+                    startActivity(intent);
+                })
+                .setNegativeButton("Не хочу", (dialog, which) -> dialog.dismiss()).create()
+                .show();
+    }
+
+    @OnShowRationale({Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE})
+    void showRationale(final PermissionRequest request) {
+        new AlertDialog.Builder(this)
+                .setTitle("Получите разрешения!!!")
+                .setMessage("Необходимо получить разрешения!!!")
+                .setPositiveButton("Хорошо", (dialog, button) -> request.proceed())
+                .setNegativeButton("Не хочу", (dialog, button) -> request.cancel())
+                .show();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_PERMITIONS) {
+            MainActivityPermissionsDispatcher.getListVodeoWithPermissionCheck(this);
+        }
+    }//onActivityResult
+
+    @Override
+    public void onBackPressed() {
+        this.finish();
+    }//onBackPressed
 }

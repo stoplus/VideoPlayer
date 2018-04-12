@@ -19,45 +19,38 @@
         android:layout_alignParentTop="true"
         android:orientation="vertical">
 
-        <!--<LinearLayout-->
-        <!--android:id="@+id/top"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="48dp"-->
-        <!--android:background="#96000000"-->
-        <!--android:gravity="center"-->
-        <!--android:orientation="horizontal"-->
-        <!--android:paddingRight="50dp"-->
-        <!--android:visibility="visible">-->
+        <LinearLayout
+            android:id="@+id/top"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:background="#96000000"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:paddingRight="50dp"
+            android:visibility="gone">
 
-        <!--<ImageButton-->
-        <!--android:id="@+id/btn_back"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_gravity="center"-->
-        <!--android:background="@null"-->
-        <!--android:padding="10dp"-->
-        <!--android:src="@drawable/hplib_ic_back" />-->
+            <ImageButton
+                android:id="@+id/btn_back"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:background="@null"
+                android:padding="10dp"
+                android:src="@drawable/hplib_ic_back" />
 
-        <!--<TextView-->
-        <!--android:id="@+id/txt_title"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:layout_weight="1"-->
-        <!--android:gravity="center|left"-->
-        <!--android:paddingLeft="10dp"-->
-        <!--android:text="Video Title"-->
-        <!--android:textAppearance="?android:attr/textAppearanceMedium"-->
-        <!--android:textColor="#FFF"-->
-        <!--android:textSize="22dp" />-->
+            <TextView
+                android:id="@+id/txt_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center|left"
+                android:paddingLeft="10dp"
+                android:text="Video Title"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="#FFF"
+                android:textSize="18sp" />
 
-        <!--<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
-        <!--android:id="@+id/cast_container"-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:gravity="center_vertical"-->
-        <!--android:orientation="horizontal"></LinearLayout>-->
-
-        <!--</LinearLayout>-->
+        </LinearLayout>
 
         <LinearLayout
             android:id="@+id/middle"
@@ -76,28 +69,27 @@
             android:layout_height="35dp"
             android:background="#96000000"
             android:orientation="horizontal"
-            android:visibility="visible">
+            android:visibility="gone">
 
             <TextView
                 android:id="@+id/txt_currentTime"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center"
                 android:paddingBottom="10dp"
                 android:paddingLeft="20dp"
                 android:paddingRight="10dp"
                 android:paddingTop="10dp"
                 android:text="00:00:00"
                 android:textAppearance="?android:attr/textAppearanceSmall"
-                android:textColor="#FFF"
-                android:layout_gravity="center"/>
+                android:textColor="#FFF" />
 
             <SeekBar
                 android:id="@+id/seekbar"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:layout_gravity="center"
-                />
+                android:layout_weight="1" />
             <!--android:indeterminate="false"
             style="@android:style/Widget.DeviceDefault.Light.SeekBar"
             android:thumbTint="#ffffff"
@@ -113,14 +105,14 @@
                 android:id="@+id/txt_totalDuration"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center"
                 android:paddingBottom="10dp"
                 android:paddingLeft="10dp"
                 android:paddingRight="20dp"
                 android:paddingTop="10dp"
                 android:text="00:00:00"
                 android:textAppearance="?android:attr/textAppearanceSmall"
-                android:textColor="#FFF"
-                android:layout_gravity="center"/>
+                android:textColor="#FFF" />
 
         </LinearLayout>
 
@@ -134,7 +126,7 @@
             android:visibility="visible">
 
             <!--<ImageButton-->
-            <!--android:id="@+id/btn_lock"-->
+            <!--android:id="@+id/id_btn_lock"-->
             <!--android:layout_width="32dp"-->
             <!--android:layout_height="32dp"-->
             <!--android:layout_gravity="right"-->
@@ -203,8 +195,7 @@
                     android:layout_marginRight="24dp"
                     android:layout_weight="1"
                     android:background="@null"
-                    android:src="@drawable/ic_stop"
-                    />
+                    android:src="@drawable/ic_stop" />
 
                 <ImageButton
                     android:id="@+id/btn_fwd"
@@ -330,7 +321,7 @@
     </LinearLayout>
 
     <RelativeLayout
-        android:id="@+id/loadingVPanel"
+        android:id="@+id/id_loadingVPanel"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="center"
@@ -344,7 +335,7 @@
     </RelativeLayout>
 
     <LinearLayout
-        android:id="@+id/volume_slider_container"
+        android:id="@+id/id_volume_slider_container"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_marginBottom="100dp"
@@ -354,13 +345,13 @@
         android:visibility="gone">
 
         <ImageView
-            android:id="@+id/volIcon"
+            android:id="@+id/id_volIcon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/hplib_volume" />
 
         <ProgressBar
-            android:id="@+id/volume_slider"
+            android:id="@+id/id_volume_slider"
             style="@android:style/Widget.ProgressBar.Horizontal"
             android:layout_width="10dp"
             android:layout_height="match_parent"
@@ -375,7 +366,7 @@
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/brightness_slider_container"
+        android:id="@+id/id_brightness_slider_container"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_marginBottom="100dp"
@@ -385,13 +376,13 @@
         android:visibility="gone">
 
         <ImageView
-            android:id="@+id/brightnessIcon"
+            android:id="@+id/id_brightnessIcon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/hplib_brightness_medium" />
 
         <ProgressBar
-            android:id="@+id/brightness_slider"
+            android:id="@+id/id_brightness_slider"
             style="@android:style/Widget.ProgressBar.Horizontal"
             android:layout_width="10dp"
             android:layout_height="match_parent"
@@ -406,7 +397,7 @@
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/unlock_panel"
+        android:id="@+id/id_unlock_panel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="10dp"
@@ -418,7 +409,7 @@
         android:visibility="gone">
 
         <ImageButton
-            android:id="@+id/btn_unlock"
+            android:id="@+id/id_btn_unlock"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -428,7 +419,7 @@
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/vol_center_text"
+        android:id="@+id/id_vol_center_text"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_centerHorizontal="true"
@@ -437,13 +428,13 @@
         android:visibility="gone">
 
         <ImageView
-            android:id="@+id/vol_image"
+            android:id="@+id/id_vol_image"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:src="@drawable/hplib_volume" />
 
         <TextView
-            android:id="@+id/vol_perc_center_text"
+            android:id="@+id/id_vol_perc_center_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text=" 22"
@@ -453,7 +444,7 @@
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/brightness_center_text"
+        android:id="@+id/id_brightness_center_text"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_centerHorizontal="true"
@@ -462,13 +453,13 @@
         android:visibility="gone">
 
         <ImageView
-            android:id="@+id/brightness_image"
+            android:id="@+id/id_brightness_image"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:src="@drawable/hplib_brightness_minimum" />
 
         <TextView
-            android:id="@+id/brigtness_perc_center_text"
+            android:id="@+id/id_brigtness_perc_center_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text=" 22"
@@ -478,7 +469,7 @@
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/seekbar_center_text"
+        android:id="@+id/id_seekbar_center_text"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_centerHorizontal="true"
@@ -487,7 +478,7 @@
         android:visibility="gone">
 
         <TextView
-            android:id="@+id/txt_seek_currTime"
+            android:id="@+id/txt_seek_curTime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="00:44"
@@ -496,7 +487,7 @@
             android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/txt_seek_secs"
+            android:id="@+id/txt_seek_seconds"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="[ +00:10 ]"

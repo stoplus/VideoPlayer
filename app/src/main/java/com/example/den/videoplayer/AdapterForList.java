@@ -1,66 +1,112 @@
 package com.example.den.videoplayer;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class AdapterForList extends BaseAdapter {
-    private List<String> list;
-    private LayoutInflater inflater; // для загрузки разметки элемента
-    private Context context;
+public class AdapterForList extends RecyclerView.Adapter<AdapterForList.ViewHolder> {
+    private LayoutInflater inflater;    // для загрузки разметки элемента
+    private List<String> list;    // коллекция выводимых данных
 
     public AdapterForList(Context context, List<String> list) {
-        this.list = list;
         this.inflater = LayoutInflater.from(context);
-    }
+        this.list = new ArrayList<>(list);
+    }//AdapterForList
 
-    private class ViewHolder {
+    //внутрений класс ViewHolder для хранения элементов разметки
+    public class ViewHolder extends RecyclerView.ViewHolder {
         final TextView name;
 
+        // в конструкторе получаем ссылки на элементы по id
+        private ViewHolder(View view) {
+            super(view);
+            name = view.findViewById(R.id.adapter_reference_name);
 
-        public ViewHolder(View view) {
-            name = (TextView) view.findViewById(R.id.adm_adapter_reference_name);
-        }
-    }
+        }//ViewHolder
+    }//class ViewHolder
 
     @Override
-    public int getCount() {
+    public int getItemCount() {
         return list.size();
-    }
+    }//getItemCount
 
     @Override
-    public Object getItem(int position) {
-        return list.get(position);
-    }
+    public long getItemId(int position) {
+        return position;
+    }//getItemId
+
+    @NonNull
+    @Override
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = inflater.inflate(R.layout.adapter_reference, parent, false);
+        return new ViewHolder(view);
+    } // onCreateViewHolder
+
 
     @Override
-    public long getItemId(int arg0) {
-        return arg0;
-    }
+    public void onBindViewHolder(@NonNull final ViewHolder holder, final int position) {
+        holder.name.setText(list.get(position));
+    }//onBindViewHolder
+    //=================================================================================================
 
-    @Override
-    public View getView(int pos, View convertView, ViewGroup parent) {
-        final ViewHolder viewHolder; //объект класса ViewHolder
+    // Filter Metods
+    public void animateTo(List<String> models) {
+        applyAndAnimateRemovals(models);
+        applyAndAnimateAdditions(models);
+        applyAndAnimateMovedItems(models);
+    }//animateTo
 
-        if (convertView == null) {
-            convertView = LayoutInflater.from(parent.getContext()).inflate(R.layout.adapter_reference, parent, false);
-            viewHolder = new AdapterForList.ViewHolder(convertView); // создать viewholder
-            convertView.setTag(viewHolder);  // сохранить ссылки на элементы разметки
-        } else {
-            // читаем сохраненный элемент
-            viewHolder = (AdapterForList.ViewHolder) convertView.getTag();
-        } // if
+    //пишем букву - удаляем лишние Items
+    private void applyAndAnimateRemovals(List<String> newModels) {
+        for (int i = list.size() - 1; i >= 0; i--) {
+            final String model = list.get(i);
+            if (!newModels.contains(model)) {
+                removeItem(i);
+            }//if
+        }//for
+    }//applyAndAnimateRemovals
 
-        // связать отображаемые элементы и значения полей
-        viewHolder.name.setText(list.get(pos));
+    //удаляем букву - добавляем Items
+    private void applyAndAnimateAdditions(List<String> newModels) {
+        for (int i = 0, count = newModels.size(); i < count; i++) {
+            final String model = newModels.get(i);
+            if (!list.contains(model)) {
+                addItem(i, model);
+            }//if
+        }//for
+    }//applyAndAnimateAdditions
 
-        // вернуть ссылку на сформированный элемент интерфейса
-        return convertView;
-    } // getView
-}
+    //присваиваем новые позиции
+    private void applyAndAnimateMovedItems(List<String> newModels) {
+        for (int toPosition = newModels.size() - 1; toPosition >= 0; toPosition--) {
+            final String model = newModels.get(toPosition);
+            final int fromPosition = list.indexOf(model);
+            if (fromPosition >= 0 && fromPosition != toPosition) {
+                moveItem(fromPosition, toPosition);
+            }//if
+        }//for
+    }//applyAndAnimateMovedItems
+
+    private void removeItem(int position) {
+        list.remove(position);
+        notifyItemRemoved(position);//обновляем ресайклер при удалении Item
+    }//removeItem
+
+    private void addItem(int position, String model) {
+        list.add(position, model);
+        notifyItemInserted(position);//обновляем ресайклер при вставке Item
+    }//addItem
+
+    private void moveItem(int fromPosition, int toPosition) {
+        final String model = list.remove(fromPosition);
+        list.add(toPosition, model);
+        notifyItemMoved(fromPosition, toPosition);//обновляем ресайклер при перемещении Items
+    }//moveItem
+}//class AdapterForAdmin
