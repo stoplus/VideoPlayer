@@ -3,7 +3,6 @@ package com.example.den.videoplayer;
 import android.Manifest;
 import android.content.ContentResolver;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.database.Cursor;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -58,6 +57,7 @@ public class MainActivity extends AppCompatActivity implements SelectedVideoInte
     private ImageButton btn_stop;
     private ImageButton btn_settings;
     private ImageButton btn_back;
+    private Button buttonPermis;
     private int curTrackIndex;
     private boolean flagStartPlay = true;
     private boolean flagSavedInstanceState = false;
@@ -84,6 +84,15 @@ public class MainActivity extends AppCompatActivity implements SelectedVideoInte
         view = getLayoutInflater().inflate(R.layout.activity_main, null);
         setContentView(view);
 
+        buttonPermis = findViewById(R.id.idButtonPermission);
+        layoutButtonPermiss = findViewById(R.id.idLayoutButtonPermiss);
+        buttonPermis.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                MainActivityPermissionsDispatcher.getListVodeoWithPermissionCheck(MainActivity.this);
+            }
+        });
+
         if (savedInstanceState != null) {
             curTrackIndex = savedInstanceState.getInt("curTrackIndex");
             list = savedInstanceState.getStringArrayList("list");
@@ -92,8 +101,11 @@ public class MainActivity extends AppCompatActivity implements SelectedVideoInte
             flagStartPlay = savedInstanceState.getBoolean("flagStartPlay");
             flagSavedInstanceState = true;
 
-            if (list == null || list.size() == 0) {
-                Snackbar.make(view, "На устройстве отсутствует видео файлы", Snackbar.LENGTH_INDEFINITE).show();
+            if (list == null){
+                Snackbar.make(view, "Нельзя запустить плеер без разрешений!", Snackbar.LENGTH_LONG).show();
+            } else if (list.size() == 0) {
+                buttonPermis.setVisibility(View.GONE);
+                Snackbar.make(view, "На устройстве отсутствует видео файлы", Snackbar.LENGTH_LONG).show();
             } else {
                 instalVidget();
                 installVideo();
@@ -380,7 +392,7 @@ public class MainActivity extends AppCompatActivity implements SelectedVideoInte
     }
 
     @NeedsPermission({Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE})
-     void getListVodeo() {
+    void getListVodeo() {
         layoutButtonPermiss = findViewById(R.id.idLayoutButtonPermiss);
         layoutButtonPermiss.setVisibility(View.GONE);
         list = new ArrayList<>();
@@ -404,7 +416,7 @@ public class MainActivity extends AppCompatActivity implements SelectedVideoInte
                 list.add(cursor.getString(dataColumn));
             } while (cursor.moveToNext());
         }
-        if (cursor != null) cursor.close();
+        cursor.close();
         curTrackIndex = 0;
         installVideo();
         if (flagSavedInstanceState) videoView.seekTo(curPosition);
@@ -425,15 +437,6 @@ public class MainActivity extends AppCompatActivity implements SelectedVideoInte
     @OnPermissionDenied({Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE})
     void permissionsDenied() {
         Snackbar.make(view, "Нельзя запустить плеер без разрешений!", Snackbar.LENGTH_LONG).show();
-        layoutButtonPermiss = findViewById(R.id.idLayoutButtonPermiss);
-        layoutButtonPermiss.setVisibility(View.VISIBLE);
-        Button button = findViewById(R.id.idButtonPermission);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                MainActivityPermissionsDispatcher.getListVodeoWithPermissionCheck(MainActivity.this);
-            }
-        });
     }//permissionsDenied
 
     @OnNeverAskAgain({Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE})

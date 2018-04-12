@@ -52,6 +52,20 @@
 
         </LinearLayout>
 
+        <RelativeLayout
+            android:id="@+id/idLayoutButtonPermiss"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:visibility="visible">
+
+            <Button
+                android:id="@+id/idButtonPermission"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Получить разрешения" />
+        </RelativeLayout>
+
         <LinearLayout
             android:id="@+id/middle"
             android:layout_width="fill_parent"
