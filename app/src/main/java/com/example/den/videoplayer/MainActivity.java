@@ -64,7 +64,6 @@ public class MainActivity extends AppCompatActivity implements SelectedVideoInte
     private LinearLayout top_controls;
     private LinearLayout middle_panel;
     private LinearLayout unlock_panel;
-    private LinearLayout bottom_controls;
     private View decorView;
     private View view;
     private int immersiveOptions;
@@ -81,8 +80,6 @@ public class MainActivity extends AppCompatActivity implements SelectedVideoInte
         view = getLayoutInflater().inflate(R.layout.activity_main, null);
         setContentView(view);
 
-        MainActivityPermissionsDispatcher.getListVodeoWithPermissionCheck(this);
-
         if (savedInstanceState != null) {
             curTrackIndex = savedInstanceState.getInt("curTrackIndex");
             list = savedInstanceState.getStringArrayList("list");
@@ -90,9 +87,21 @@ public class MainActivity extends AppCompatActivity implements SelectedVideoInte
             curPosition = savedInstanceState.getInt("curPosition");
             flagStartPlay = savedInstanceState.getBoolean("flagStartPlay");
             flagSavedInstanceState = true;
-        }
+
+            if (list == null || list.size() == 0) {
+                Snackbar.make(view, "На устройстве отсутствует видео файлы", Snackbar.LENGTH_INDEFINITE).show();
+            } else {
+                instalVidget();
+                installVideo();
+                videoView.seekTo(curPosition);
+                initializationButtons();
+            }
+        } else MainActivityPermissionsDispatcher.getListVodeoWithPermissionCheck(this);
         if (dialogPlayList != null && !dialogPlayList.isVisible()) {
             flagStartPlay = true;
+        }
+        if (list == null || list.size() == 0) {
+            Snackbar.make(view, "На устройстве отсутствует видео файлы", Snackbar.LENGTH_INDEFINITE).show();
         }
     }//onCreate
 
@@ -117,6 +126,8 @@ public class MainActivity extends AppCompatActivity implements SelectedVideoInte
         seekbar_time.setVisibility(View.VISIBLE);
         LinearLayout top = findViewById(R.id.top);
         top.setVisibility(View.VISIBLE);
+        LinearLayout bottom_controls = findViewById(R.id.controls);
+        bottom_controls.setVisibility(View.VISIBLE);
 
         immersiveOptions = (View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
                 | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
@@ -291,6 +302,7 @@ public class MainActivity extends AppCompatActivity implements SelectedVideoInte
     // ==============================================================================================
 
     private void installVideo() {
+        videoView = findViewById(R.id.idVideoView);
         if (list != null) {
             if (list.size() != 0) {
                 hideControls = new Runnable() {
@@ -300,7 +312,6 @@ public class MainActivity extends AppCompatActivity implements SelectedVideoInte
                     }
                 };
                 String videoSource = list.get(curTrackIndex);
-                videoView = findViewById(R.id.idVideoView);
                 videoView.setVideoPath(videoSource);
                 videoView.requestFocus(0);
                 if (flagStartPlay) {

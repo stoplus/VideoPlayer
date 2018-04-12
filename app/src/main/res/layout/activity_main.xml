@@ -125,7 +125,7 @@
             android:background="#96000000"
             android:orientation="horizontal"
             android:paddingBottom="5dp"
-            android:visibility="visible">
+            android:visibility="gone">
 
             <!--<ImageButton-->
                 <!--android:id="@+id/btn_lock"-->
