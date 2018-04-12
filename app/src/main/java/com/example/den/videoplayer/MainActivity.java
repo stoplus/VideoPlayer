@@ -107,6 +107,7 @@ public class MainActivity extends AppCompatActivity implements SelectedVideoInte
                 buttonPermis.setVisibility(View.GONE);
                 Snackbar.make(view, "На устройстве отсутствует видео файлы", Snackbar.LENGTH_LONG).show();
             } else {
+                layoutButtonPermiss.setVisibility(View.GONE);
                 instalVidget();
                 installVideo();
                 videoView.seekTo(curPosition);
