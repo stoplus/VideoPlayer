@@ -113,7 +113,7 @@ public class MainActivity extends AppCompatActivity implements SelectedVideoInte
                 videoView.seekTo(curPosition);
                 initializationButtons();
             }
-        } else MainActivityPermissionsDispatcher.getListVodeoWithPermissionCheck(this);
+        } else MainActivityPermissionsDispatcher.getListVodeoWithPermissionCheck(this);//install after running
         if (dialogPlayList != null && !dialogPlayList.isVisible()) {
             flagStartPlay = true;
         }
@@ -197,6 +197,7 @@ public class MainActivity extends AppCompatActivity implements SelectedVideoInte
                     public void onClick(View view) {
                         if (videoView.isPlaying()) {
                             videoView.pause();
+                            flagStartPlay = false;
                             btn_pause.setVisibility(View.GONE);
                             btn_play.setVisibility(View.VISIBLE);
                         }
@@ -466,10 +467,12 @@ public class MainActivity extends AppCompatActivity implements SelectedVideoInte
                 .show();
     }
 
+//install after running
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         // NOTE: delegate the permission handling to generated method
+        //install after running
         MainActivityPermissionsDispatcher.onRequestPermissionsResult(this, requestCode, grantResults);
     }
 
